@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import GUI from 'lil-gui';
 
 // to create complex shapes, we better use a dedicated 3D software like
@@ -32,11 +33,35 @@ const canvas = document.querySelector('canvas.webgl');
 // Scene
 const scene = new THREE.Scene();
 
+//Fog
+const fogMeasurements = {
+    color:  '#67533f', //#03343f
+    density: 0.05
+};
+scene.fog = new THREE.FogExp2(
+    fogMeasurements.color,
+    fogMeasurements.density
+)
+
+
+//BG
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('/img/eilenriede_labyrinth_1k.hdr', function (hdrTexture) {
+    hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+
+    // Aplicar el HDRI como fondo de la escena
+    scene.background = hdrTexture;
+    scene.environment = hdrTexture; // También puede usarse para reflejos en materiales PBR
+});
+
 /**
  * Textures
  * 
  */
 const textureLoader = new THREE.TextureLoader();
+
+
+
 
 //FLOOR TEXTURE
 const floorAlphaTexture = textureLoader.load('./floor/alpha.webp');
@@ -252,6 +277,8 @@ directionalLight.shadow.camera.right = 7
 directionalLight.shadow.camera.bottom = - 7
 directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
+
+
 
 /**
  * Sizes
