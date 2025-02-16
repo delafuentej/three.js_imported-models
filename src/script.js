@@ -24,15 +24,45 @@ import GUI from 'lil-gui';
  * Base
  */
 // Debug
-const gui = new GUI()
+const gui = new GUI();
 
 // Canvas
-const canvas = document.querySelector('canvas.webgl')
+const canvas = document.querySelector('canvas.webgl');
 
 // Scene
-const scene = new THREE.Scene()
+const scene = new THREE.Scene();
 
+/**
+ * Textures
+ * 
+ */
+const textureLoader = new THREE.TextureLoader();
 
+//FLOOR TEXTURE
+const floorAlphaTexture = textureLoader.load('./floor/alpha.webp');
+
+const floorColorTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_diff_1k.webp');
+const floorARMTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_arm_1k.webp');
+const floorNormalTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_nor_gl_1k.webp');
+const floorDisplacementTexture = textureLoader.load('./floor/coast_sand_rocks_02_1k/coast_sand_rocks_02_disp_1k.webp');
+
+floorColorTexture.repeat.set(8,8);
+floorColorTexture.repeat.set(8, 8);
+floorARMTexture.repeat.set(8, 8);
+floorNormalTexture.repeat.set(8, 8);
+floorDisplacementTexture.repeat.set(8, 8);
+
+floorColorTexture.wrapS = THREE.RepeatWrapping;
+floorARMTexture.wrapS = THREE.RepeatWrapping;
+floorNormalTexture.wrapS = THREE.RepeatWrapping;
+floorDisplacementTexture.wrapS = THREE.RepeatWrapping;
+
+floorColorTexture.wrapT = THREE.RepeatWrapping;
+floorARMTexture.wrapT = THREE.RepeatWrapping;
+floorNormalTexture.wrapT = THREE.RepeatWrapping;
+floorDisplacementTexture.wrapT = THREE.RepeatWrapping;
+
+floorColorTexture.colorSpace = THREE.SRGBColorSpace;
 /**
  * Models- GLTF Loader
  */
@@ -94,7 +124,7 @@ function playRandomAnimation() {
     if (!mixer || actions.length === 0) return;
 
     if (activeAction) {
-        activeAction.stop(); //to stop the current animation
+        activeAction.stop(); //to stop the currentanimation
     }
 
     const randomIndex = Math.floor(Math.random() * actions.length);
@@ -188,11 +218,18 @@ function playRandomAnimation() {
  * Floor
  */
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
+    new THREE.PlaneGeometry(20, 20, 100, 100),
     new THREE.MeshStandardMaterial({
-        color: '#444444',
-        metalness: 0,
-        roughness: 0.5
+        alphaMap: floorAlphaTexture,
+        transparent: true,
+        map: floorColorTexture,
+        aoMap: floorARMTexture,
+        roughnessMap: floorARMTexture,
+        metalnessMap: floorARMTexture,
+        normalMap: floorNormalTexture,
+        displacementMap: floorDisplacementTexture,
+        displacementScale: 0.3,
+        displacementBias: - 0.2
     })
 )
 floor.receiveShadow = true
